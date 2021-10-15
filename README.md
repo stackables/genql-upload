@@ -1,5 +1,5 @@
 [![npm](https://img.shields.io/npm/v/genql-upload?label=genql-upload&logo=npm)](https://www.npmjs.com/package/genql-upload)
-[![codecov](https://codecov.io/gh/stackables/genql-upload/branch/main/graph/badge.svg?token=ynUW2JLulr)](https://codecov.io/gh/stackables/genql-upload)
+[![codecov](https://codecov.io/gh/stackables/genql-upload/branch/main/graph/badge.svg?token=x1DmWF8EId)](https://codecov.io/gh/stackables/genql-upload)
 
 # Graphql Upload support for genql
 
