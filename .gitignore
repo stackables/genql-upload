@@ -1,0 +1,7 @@
+node_modules
+build
+coverage
+.DS_Store
+test/generated
+local-file-output.txt
+*.tgz
