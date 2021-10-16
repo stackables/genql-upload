@@ -54,6 +54,16 @@ async function upload() {
 
 See the [basic test](./test/) for full usage including the server setup.
 
+## Running locally
+
+Generate the test sdk by running `genql --schema ./test/schema.graphql --output ./test/generated` or use the npm script `npm run test:generate`.
+
+```bash
+npm install
+npm run test:generate
+npm test
+```
+
 ## Thats it ...
 
 ... happy coding :)
