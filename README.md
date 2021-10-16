@@ -38,11 +38,15 @@ import { FileUpload } from "genql-upload";
 import fs from "fs";
 
 async function upload() {
-  // client is setup before
+  // read stream is valid file input
+  const file1 = new FileUpload(fs.createReadStream("./README.md"));
+
+  // but file can also be Buffer
+  const file2 = new FileUpload(Buffer.from(/* ... */), "filename.txt");
 
   const response = await client.chain.mutation
     .singleUpload({
-      file: new FileUpload(fs.createReadStream("./README.md")),
+      file: file1, // file2
     })
     .get({
       filename: true,
