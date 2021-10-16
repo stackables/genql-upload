@@ -26,7 +26,7 @@ afterAll(async () => {
     }
 })
 
-test('Test using express', async () => {
+test('Test with createReadStream', async () => {
 
     const client = createClient({
         fetcher: createFetcher({
@@ -41,6 +41,39 @@ test('Test using express', async () => {
 
     const f = await client.chain.mutation.singleUpload({
         file: new FileUpload(fs.createReadStream('./SECURITY.md'))
+    }).get({
+        filename: true,
+        mimetype: true,
+        headers: true
+    })
+
+    expect(f.filename).toBe('SECURITY.md')
+    expect(f.mimetype).toBe('text/markdown')
+
+    const headers = JSON.parse(f.headers)
+    expect(headers['x-test']).toBe('test')
+
+    // expect this to not throw
+    await fsp.unlink('local-file-output.txt')
+})
+
+test('Test with Buffer', async () => {
+
+    const client = createClient({
+        fetcher: createFetcher({
+            url: serverUrl,
+            headers: async () => {
+                return {
+                    'X-Test': 'test'
+                }
+            }
+        })
+    })
+
+    const fileBuffer = fs.readFileSync('./SECURITY.md')
+
+    const f = await client.chain.mutation.singleUpload({
+        file: new FileUpload(fileBuffer, 'SECURITY.md')
     }).get({
         filename: true,
         mimetype: true,

@@ -44,7 +44,7 @@ export function createFetcher(opts: GenqlUploadOptions) {
         // 3. all files not (same index as in map)
         let j = 0;
         for (const [file] of files) {
-            formData.append(`${j++}`, file.data)
+            formData.append(`${j++}`, file.data, file.name);
         }
 
         // normal fetch
