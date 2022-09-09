@@ -2,7 +2,7 @@ import type { GraphqlOperation } from '@genql/runtime';
 import type { ExecutionResult } from '@genql/runtime/dist/types';
 import { extractFiles } from 'extract-files';
 import FormData from 'form-data';
-import fetch from 'isomorphic-unfetch';
+import fetch from 'isomorphic-fetch';
 
 type HeadersInit = Record<string, string>
 
