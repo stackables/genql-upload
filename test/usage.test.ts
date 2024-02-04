@@ -1,91 +1,97 @@
-import fs from 'fs'
-import fsp from 'fs/promises'
-import { AddressInfo, Server } from 'net'
-import { createFetcher, FileUpload } from '../src'
-import { createClient } from './generated'
-import { startServer } from './server'
+import fs from "fs";
+import fsp from "fs/promises";
+import { AddressInfo, Server } from "net";
+import { FileUpload, createFetcher } from "../src";
+import { createClient } from "./generated";
+import { startServer } from "./server";
 
-let server: Server
-let serverUrl: string
+let server: Server;
+let serverUrl: string;
 
 beforeAll(async () => {
-    server = await startServer()
-    const address = server.address() as AddressInfo
-    serverUrl = `http://localhost:${address.port}/graphql`
+	server = await startServer();
+	const address = server.address() as AddressInfo;
+	serverUrl = `http://localhost:${address.port}/graphql`;
 
-    try {
-        await fsp.unlink('local-file-output.txt')
-    } catch (error) {
-        // ignore this one :)
-    }
-})
+	try {
+		await fsp.unlink("local-file-output.txt");
+	} catch (error) {
+		// ignore this one :)
+	}
+});
 
 afterAll(async () => {
-    if (server) {
-        server.close()
-    }
-})
+	if (server) {
+		server.close();
+	}
+});
 
-test('Test with createReadStream', async () => {
+test("Test with createReadStream", async () => {
+	const client = createClient({
+		fetcher: createFetcher({
+			url: serverUrl,
+			headers: async () => {
+				return {
+					"X-Test": "test",
+					"x-apollo-operation-name": "singleUpload",
+				};
+			},
+		}),
+	});
 
-    const client = createClient({
-        fetcher: createFetcher({
-            url: serverUrl,
-            headers: async () => {
-                return {
-                    'X-Test': 'test'
-                }
-            }
-        })
-    })
+	const f = await client.mutation({
+		singleUpload: {
+			__args: {
+				file: new FileUpload(fs.createReadStream("./SECURITY.md")),
+			},
+			filename: true,
+			mimetype: true,
+			headers: true,
+		},
+	});
 
-    const f = await client.chain.mutation.singleUpload({
-        file: new FileUpload(fs.createReadStream('./SECURITY.md'))
-    }).get({
-        filename: true,
-        mimetype: true,
-        headers: true
-    })
+	expect(f.singleUpload.filename).toBe("SECURITY.md");
+	expect(f.singleUpload.mimetype).toBe("text/markdown");
 
-    expect(f.filename).toBe('SECURITY.md')
-    expect(f.mimetype).toBe('text/markdown')
+	const headers = JSON.parse(f.singleUpload.headers);
+	expect(headers["x-test"]).toBe("test");
 
-    const headers = JSON.parse(f.headers)
-    expect(headers['x-test']).toBe('test')
+	// expect this to not throw
+	await fsp.unlink("local-file-output.txt");
+});
 
-    // expect this to not throw
-    await fsp.unlink('local-file-output.txt')
-})
+test("Test with Buffer", async () => {
+	const client = createClient({
+		fetcher: createFetcher({
+			url: serverUrl,
+			headers: async () => {
+				return {
+					"X-Test": "test",
+					"x-apollo-operation-name": "singleUpload",
+				};
+			},
+		}),
+	});
 
-test('Test with Buffer', async () => {
+	const fileBuffer = fs.readFileSync("./SECURITY.md");
 
-    const client = createClient({
-        fetcher: createFetcher({
-            url: serverUrl,
-            headers: async () => {
-                return {
-                    'X-Test': 'test'
-                }
-            }
-        })
-    })
+	const f = await client.mutation({
+		singleUpload: {
+			__args: {
+				file: new FileUpload(fileBuffer, "SECURITY.md"),
+			},
+			filename: true,
+			mimetype: true,
+			headers: true,
+		},
+	});
 
-    const fileBuffer = fs.readFileSync('./SECURITY.md')
+	expect(f.singleUpload.filename).toBe("SECURITY.md");
+	expect(f.singleUpload.mimetype).toBe("text/markdown");
 
-    const f = await client.chain.mutation.singleUpload({
-        file: new FileUpload(fileBuffer, 'SECURITY.md')
-    }).get({
-        filename: true,
-        mimetype: true,
-        headers: true
-    })
+	const headers = JSON.parse(f.singleUpload.headers);
+	expect(headers["x-test"]).toBe("test");
 
-    expect(f.filename).toBe('SECURITY.md')
-    expect(f.mimetype).toBe('text/markdown')
-
-    const headers = JSON.parse(f.headers)
-    expect(headers['x-test']).toBe('test')
-
-    // expect this to not throw
-    await fsp.unlink('local-file-output.txt')
-})
+	// expect this to not throw
+	await fsp.unlink("local-file-output.txt");
+});
