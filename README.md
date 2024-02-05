@@ -15,6 +15,16 @@ npm install genql-upload
 
 First [generate your typed client](https://genql.vercel.app/docs) and connect a [custom fetcher](https://genql.vercel.app/docs/usage/create-the-client#using-a-custom-fetcher) as shown below.
 
+```graphql
+# Given this schema
+
+scalar Upload
+
+type Mutation {
+  singleUpload(file: Upload!): String
+}
+```
+
 ```typescript
 import { createClient } from "./generated_dir";
 import { createFetcher } from "genql-upload";
@@ -44,15 +54,13 @@ async function upload() {
   // but file can also be Buffer
   const file2 = new FileUpload(Buffer.from(/* ... */), "filename.txt");
 
-  const response = await client.chain.mutation
-    .singleUpload({
-      file: file1, // file2
-    })
-    .get({
-      filename: true,
-      mimetype: true,
-      headers: true,
-    });
+  const response = await client.mutation({
+    singleUpload: {
+      __args: {
+        file: file1 // file2
+      }
+    },
+  });
 }
 ```
 
