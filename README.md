@@ -1,3 +1,6 @@
+> [!WARNING]
+> **No longer maintained.** This repository is archived. `genql-upload` stays on npm at its last version (1.3.0), but gets no further updates or security fixes.
+
 [![npm](https://img.shields.io/npm/v/genql-upload?label=genql-upload&logo=npm)](https://www.npmjs.com/package/genql-upload)
 [![codecov](https://codecov.io/gh/stackables/genql-upload/branch/main/graph/badge.svg?token=x1DmWF8EId)](https://codecov.io/gh/stackables/genql-upload)
 
